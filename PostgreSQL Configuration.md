@@ -197,6 +197,7 @@ docker exec postgres-config df - ตรวจสอบพื้นที่ก�
 ```
 
 3.docker exec postgres-config nproc  แสดงค่าผลลัพธ์อย่างไร
+
    <img width="507" height="49" alt="image" src="https://github.com/user-attachments/assets/1d1d793e-fc7d-406b-91d8-3a3bf45911c3" />
 
 
@@ -217,8 +218,12 @@ SHOW data_directory;
 
 ### บันทึกผลการทดลอง
 ```
+```
 1. ตำแหน่งที่อยู่ของไฟล์ configuration อยู่ที่ตำแหน่งใด
+   /var/lib/postgresql/data/postgresql.conf
 2. ตำแหน่งที่อยู่ของไฟล์ data อยู่ที่ตำแหน่งใด
+   /var/lib/postgresql/data
+```
 ```
 -- ตรวจสอบการตั้งค่าปัจจุบัน
 SELECT name, setting, unit, category, short_desc 
@@ -228,10 +233,11 @@ WHERE name IN (
     'wal_buffers', 'effective_cache_size', 'max_connections'
 );
 ```
+
 ### บันทึกผลการทดลอง
-```
-บันทึกรูปผลของ configuration ทั้ง 6 ค่า 
-```
+
+<img width="1148" height="416" alt="image" src="https://github.com/user-attachments/assets/71eba7c5-c89c-4f63-b7b6-6c891e853ea7" />
+
 
 ### Step 2: การปรับแต่งพารามิเตอร์แบบค่อยเป็นค่อยไป
 
@@ -244,9 +250,15 @@ WHERE name = 'shared_buffers';
 
 ### ผลการทดลอง
 ```
-1.รูปผลการรันคำสั่ง
+```
 2. ค่า  shared_buffers มีการกำหนดค่าไว้เท่าไหร่ (ใช้ setting X unit)
+16384×8 kB=131,072 kB
+1024/131,072 kB =128 MB
 3. ค่า  pending_restart ในผลการทดลองมีค่าเป็นอย่างไร และมีความหมายอย่างไร
+(16384 x 8kB = 128MB) เป็นค่าที่ถูกนำมาใช้งานในระบบเรียบร้อยแล้ว และมีผลบังคับใช้อยู่จริง
+```
+
+1. <img width="777" height="115" alt="image" src="https://github.com/user-attachments/assets/49957c97-db2d-4147-98d9-ba05fc290ed3" />
 ```
 -- คำนวณและตั้งค่าใหม่
 -- สำหรับระบบ 2GB: 512MB (25%)
@@ -263,11 +275,14 @@ WHERE name = 'shared_buffers';
 docker exec -it -u postgres postgres-config pg_ctl restart -D /var/lib/postgresql/data -m fast
 
 ### ผลการทดลอง
-```
+
 รูปผลการเปลี่ยนแปลงค่า pending_restart
+
+<img width="582" height="200" alt="image" src="https://github.com/user-attachments/assets/173f7ed2-7c11-4784-87fb-0f1427e0da66" />
+
 รูปหลังจาก restart postgres
 
-```
+<img width="314" height="129" alt="image" src="https://github.com/user-attachments/assets/dcfd0fda-e4a8-4db3-92c0-c98f91ba71e9" />
 
 #### 2.2 ปรับแต่ง Work Memory (ไม่ต้อง restart)
 ```sql
@@ -288,9 +303,11 @@ FROM pg_settings
 WHERE name = 'work_mem';
 ```
 ### ผลการทดลอง
-```
+
 รูปผลการเปลี่ยนแปลงค่า work_mem
-```
+
+<img width="467" height="182" alt="image" src="https://github.com/user-attachments/assets/6632bbdc-3e79-4c17-8230-9695ca94499c" />
+
 
 #### 3.3 ปรับแต่ง Maintenance Work Memory
 ```sql
@@ -305,9 +322,11 @@ SELECT pg_reload_conf();
 SHOW maintenance_work_mem;
 ```
 ### ผลการทดลอง
-```
+
 รูปผลการเปลี่ยนแปลงค่า maintenance_work_mem
-```
+
+<img width="401" height="123" alt="image" src="https://github.com/user-attachments/assets/29273181-ba73-46fc-8649-bcb40b606990" />
+
 
 #### 3.4 ปรับแต่ง WAL Buffers
 ```sql
@@ -330,9 +349,11 @@ docker exec -it postgres-config psql -U postgres
 SHOW wal_buffers;
 ```
 ### ผลการทดลอง
-```
+
 รูปผลการเปลี่ยนแปลงค่า wal_buffers
-```
+
+<img width="278" height="128" alt="image" src="https://github.com/user-attachments/assets/4c964686-fa78-404f-8c29-f37def89c330" />
+
 
 #### 3.5 ปรับแต่ง Effective Cache Size
 ```sql
@@ -347,9 +368,11 @@ SELECT pg_reload_conf();
 SHOW effective_cache_size;
 ```
 ### ผลการทดลอง
-```
+
 รูปผลการเปลี่ยนแปลงค่า effective_cache_size
-```
+
+<img width="368" height="140" alt="image" src="https://github.com/user-attachments/assets/ee3d1a15-8e09-4187-9f5e-49fcbed260b8" />
+
 
 ### Step 4: ตรวจสอบผล
 
@@ -376,9 +399,11 @@ WHERE name IN (
 ORDER BY name;
 ```
 ### ผลการทดลอง
-```
+
 รูปผลการลัพธ์การตั้งค่า
-```
+
+<img width="1165" height="286" alt="image" src="https://github.com/user-attachments/assets/a8ae9ec2-f0dd-42d4-a72c-d7ef13a85b8f" />
+
 
 ### Step 5: การสร้างและทดสอบ Workload
 
@@ -422,9 +447,13 @@ LIMIT 1000;
 ### ผลการทดลอง
 ```
 1. คำสั่ง EXPLAIN(ANALYZE,BUFFERS) คืออะไร 
-2. รูปผลการรัน
+
 3. อธิบายผลลัพธ์ที่ได้
+
 ```
+2. รูปผลการรัน
+<img width="591" height="316" alt="image" src="https://github.com/user-attachments/assets/40e45965-842b-47a9-8f9b-aebc2d7f8080" />
+
 ```sql
 -- ทดสอบ Hash operation
 EXPLAIN (ANALYZE, BUFFERS)

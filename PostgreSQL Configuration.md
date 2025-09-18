@@ -447,9 +447,9 @@ LIMIT 1000;
 ### ผลการทดลอง
 ```
 1. คำสั่ง EXPLAIN(ANALYZE,BUFFERS) คืออะไร 
-
+ วิเคราะห์ประสิทธิภาพของคำสั่ง SQL 
 3. อธิบายผลลัพธ์ที่ได้
-
+คำสั่งนี้มีการใช้ parallel query execution เพื่อเร่งความเร็วในการดึงข้อมูลจำนวนมาก แล้วจำกัดผลลัพธ์ไว้ที่ 1,000
 ```
 2. รูปผลการรัน
 <img width="591" height="316" alt="image" src="https://github.com/user-attachments/assets/40e45965-842b-47a9-8f9b-aebc2d7f8080" />
